@@ -21,6 +21,7 @@ export interface ContentBlock {
 export interface AIFeedback {
   generated_at: string;
   entries_analyzed: number;
+  report_type?: 'analysis' | 'eval';
   content: ContentBlock[];
 }
 

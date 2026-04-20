@@ -30,7 +30,7 @@ type Line =
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const { entries, feedback, analyzing, sync, syncMsg, load, add, runAnalysis, clearFeedback } = useStore();
+  const { entries, feedback, analyzing, sync, syncMsg, load, add, runAnalysis, runEvaluation, clearFeedback } = useStore();
   const [draft, setDraft] = useState('');
   const [booted, setBooted] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -63,6 +63,7 @@ export default function App() {
       if (!text) return;
       // Commands
       if (text === '/analyze') { runAnalysis(); setDraft(''); return; }
+      if (text.startsWith('/eval ')) { runEvaluation(text.slice(6).trim()); setDraft(''); return; }
       if (text === '/clear')   { clearFeedback(); setDraft(''); return; }
       if (text === '/help') {
         setDraft('');
@@ -78,7 +79,7 @@ export default function App() {
 
   lines.push({ kind: 'boot', text: `TRADING JOURNAL  //  ${today()}` });
   lines.push({ kind: 'boot', text: 'Type your trade notes and press Enter to save.' });
-  lines.push({ kind: 'boot', text: 'Commands:  /analyze · /clear · Shift+Enter for new line' });
+  lines.push({ kind: 'boot', text: 'Commands:  /analyze · /eval <trade> · /clear' });
   lines.push({ kind: 'divider' });
 
   if (booted && entries.length === 0 && sync !== 'syncing') {
@@ -168,10 +169,11 @@ function EntryLine({ entry }: { entry: JournalEntry }) {
 // ─── Feedback Block ───────────────────────────────────────────────────────────
 
 function FeedbackBlock({ feedback, onClear }: { feedback: AIFeedback; onClear: () => void }) {
+  const isEval = feedback.report_type === 'eval';
   return (
-    <div className="term-feedback">
+    <div className={`term-feedback ${isEval ? 'is-eval' : ''}`}>
       <p className="fb-header">
-        ── ANALYST REPORT · {feedback.entries_analyzed} entries ·{' '}
+        {isEval ? '── PRE-TRADE EVALUATION' : '── ANALYST REPORT'} · {feedback.entries_analyzed} entries ·{' '}
         {new Date(feedback.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         <button className="fb-clear" onClick={onClear}>clear</button>
       </p>

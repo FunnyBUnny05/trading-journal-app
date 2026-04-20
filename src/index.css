@@ -192,6 +192,13 @@ html, body, #root {
   top: 0; left: 0; right: 0; height: 3px;
   background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
 }
+.term-feedback.is-eval {
+  background: rgba(16, 185, 129, 0.02);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+.term-feedback.is-eval::before {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+}
 
 .fb-header {
   font-size: 12px;

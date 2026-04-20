@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { JournalEntry, AIFeedback, SyncStatus } from '../types/trade';
 import { saveEntry, loadEntries } from '../services/githubService';
-import { analyze } from '../services/claudeService';
+import { analyze, evaluateTrade } from '../services/claudeService';
 
 function uid() { return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`; }
 
@@ -15,6 +15,7 @@ interface Store {
   load: () => Promise<void>;
   add: (text: string) => Promise<void>;
   runAnalysis: () => Promise<void>;
+  runEvaluation: (proposedTrade: string) => Promise<void>;
   clearFeedback: () => void;
 }
 
@@ -55,6 +56,18 @@ export const useStore = create<Store>((set, get) => ({
       set({ feedback, analyzing: false });
     } catch (e: unknown) {
       set({ analyzing: false, sync: 'err', syncMsg: e instanceof Error ? e.message : 'analysis failed' });
+    }
+  },
+
+  runEvaluation: async (proposedTrade: string) => {
+    const { entries } = get();
+    if (!entries.length) return;
+    set({ analyzing: true, feedback: null });
+    try {
+      const feedback = await evaluateTrade(entries, proposedTrade);
+      set({ feedback, analyzing: false });
+    } catch (e: unknown) {
+      set({ analyzing: false, sync: 'err', syncMsg: e instanceof Error ? e.message : 'evaluation failed' });
     }
   },
 
