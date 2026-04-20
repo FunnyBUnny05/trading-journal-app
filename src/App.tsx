@@ -62,6 +62,12 @@ export default function App() {
       const text = draft.trim();
       if (!text) return;
       // Commands
+      if (text.startsWith('/key ')) { 
+        localStorage.setItem('anthropicKey', text.slice(5).trim()); 
+        setDraft(''); 
+        alert('✅ Anthropic API Key securely saved to your browser cache.');
+        return; 
+      }
       if (text === '/analyze') { runAnalysis(); setDraft(''); return; }
       if (text.startsWith('/eval ')) { runEvaluation(text.slice(6).trim()); setDraft(''); return; }
       if (text === '/clear')   { clearFeedback(); setDraft(''); return; }
@@ -79,7 +85,7 @@ export default function App() {
 
   lines.push({ kind: 'boot', text: `TRADING JOURNAL  //  ${today()}` });
   lines.push({ kind: 'boot', text: 'Type your trade notes and press Enter to save.' });
-  lines.push({ kind: 'boot', text: 'Commands:  /analyze · /eval <trade> · /clear' });
+  lines.push({ kind: 'boot', text: 'Commands:  /analyze · /eval <trade> · /key <api_key> · /clear' });
   lines.push({ kind: 'divider' });
 
   if (booted && entries.length === 0 && sync !== 'syncing') {

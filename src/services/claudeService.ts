@@ -1,8 +1,7 @@
 import type { JournalEntry, AIFeedback, ContentBlock } from '../types/trade';
 
-const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY as string;
-const ENV_ID  = import.meta.env.VITE_ANTHROPIC_ENV_ID as string;
-const MODEL   = (import.meta.env.VITE_CLAUDE_MODEL as string) || 'claude-3-7-sonnet-20250219';
+const ENV_ID = 'env_01WmmGFFHDixNajE1C8c9TJz';
+const MODEL = 'claude-3-7-sonnet-20250219';
 const API_URL = 'https://api.anthropic.com/v1/messages';
 
 const SYSTEM = `You are a quantitative trading analyst with access to pandas and matplotlib.
@@ -23,8 +22,8 @@ function format(entries: JournalEntry[]): string {
 }
 
 export async function analyze(entries: JournalEntry[]): Promise<AIFeedback> {
-  if (!API_KEY) throw new Error('VITE_ANTHROPIC_API_KEY not set in .env');
-  if (!ENV_ID) throw new Error('VITE_ANTHROPIC_ENV_ID not set. Please run the init-env.js script first.');
+  const API_KEY = localStorage.getItem('anthropicKey');
+  if (!API_KEY) throw new Error('AI Engine Offline: Please type `/key sk-ant...` to connect your Anthropic API Key.');
 
   const userMsg = `Here are ${entries.length} journal entries from a trader:\n\n${format(entries)}\n\nGive me your statistical and behavioral assessment. Output charts inline.`;
 
@@ -53,8 +52,8 @@ export async function analyze(entries: JournalEntry[]): Promise<AIFeedback> {
 }
 
 export async function evaluateTrade(entries: JournalEntry[], proposedTrade: string): Promise<AIFeedback> {
-  if (!API_KEY) throw new Error('VITE_ANTHROPIC_API_KEY not set in .env');
-  if (!ENV_ID) throw new Error('VITE_ANTHROPIC_ENV_ID not set. Please run the init-env.js script first.');
+  const API_KEY = localStorage.getItem('anthropicKey');
+  if (!API_KEY) throw new Error('AI Engine Offline: Please type `/key sk-ant...` to connect your Anthropic API Key.');
 
   const userMsg = `Here are ${entries.length} journal entries from the trader:\n\n${format(entries)}\n\nTHE PROPOSED TRADE:\n"${proposedTrade}"\n\nGive me your final GO or NO-GO pre-trade evaluation based on my history.`;
 
